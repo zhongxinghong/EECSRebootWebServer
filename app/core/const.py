@@ -7,6 +7,8 @@ __all__ = [
     "ROOT_DIR", "BASE_DIR",
 
     "MAX_TIMESTAMP_DELAY",
+    "ACTIVITY_PERIOD_SPAN",
+    "REPAIR_TYPES",
 
     "OnlineOrderStatus", "OnsiteOrderStatus",
 
@@ -21,6 +23,10 @@ ROOT_DIR = _absP("../") # project dir
 BASE_DIR = _absP("./")  # app dir
 
 MAX_TIMESTAMP_DELAY = 30 * 1000 # 30s
+ACTIVITY_PERIOD_SPAN = 30
+REPAIR_TYPES = ('dust','hardware','software','other')
+
+""" Status Enum 在某些场合需要调 .value 属性转为真正的 int 值 ！ """
 
 @unique
 class OnlineOrderStatus(IntEnum):
@@ -30,6 +36,6 @@ class OnlineOrderStatus(IntEnum):
 
 @unique
 class OnsiteOrderStatus(IntEnum):
-    Waiting    = 0
-    Processing = 1
-    Finished   = 2
+    WAITING    = 0
+    PROCESSING = 1
+    FINISHED   = 2

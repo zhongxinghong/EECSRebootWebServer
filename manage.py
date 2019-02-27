@@ -4,16 +4,18 @@
 
 from flask_script import Manager, Server, Shell
 from app import create_app, db
-from app.core.models import OnlineOrder, OnsiteOrder
+from app.core.models import User, Activity, OnlineOrder, OnsiteOrder
 
 
-app = create_app("default")
+app = create_app("testing")
 
 
 def _make_shell_context():
     return {
         "app": app,
         "db": db,
+        "User": User,
+        "Activity": Activity,
         "OnlineOrder": OnlineOrder,
         "OnsiteOrder": OnsiteOrder,
     }

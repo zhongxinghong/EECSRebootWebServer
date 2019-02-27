@@ -7,6 +7,9 @@ __all__ = [
     "bMD5", "bSHA1", "bSHA256",
     "xMD5", "xSHA1", "xSHA256",
 
+    "_get_pre_signature_string",
+    "get_signature",
+
     ]
 
 
@@ -32,3 +35,9 @@ def xSHA1(s):
 def xSHA256(s):
     return hashlib.sha256(b(s)).hexdigest()
 
+
+def _get_pre_signature_string(data):
+    return "&".join("=".join( (k, str(v)) ) for k, v in sorted(data.items()))
+
+def get_signature(data):
+    return xMD5(_get_pre_signature_string(data))

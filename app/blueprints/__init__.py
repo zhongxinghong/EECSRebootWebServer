@@ -4,4 +4,6 @@
 
 from .root import bpRoot
 from .user import bpUser
+from .activity import bpActivity
 from .online import bpOnline
+from .onsite import bpOnsite

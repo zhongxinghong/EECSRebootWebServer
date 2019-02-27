@@ -12,10 +12,10 @@ __all__ = [
 
 
 from flask import Flask, Blueprint, jsonify, url_for
-from werkzeug.routing import RequestRedirect, MethodNotAllowed, NotFound, BuildError
 from config import CONFIGS_MAP
+from .core.globals import cache
 from .core.models import db
-from .blueprints import bpRoot, bpUser, bpOnline
+from .blueprints import bpRoot, bpUser, bpActivity, bpOnline, bpOnsite
 
 
 def create_app(config_name):
@@ -25,10 +25,13 @@ def create_app(config_name):
     app.config.from_object(cfg)
     cfg.init_app(app)
     db.init_app(app)
+    cache.init_app(app)
 
     app.register_blueprint(bpRoot)
     app.register_blueprint(bpUser, url_prefix="/user")
+    app.register_blueprint(bpActivity, url_prefix="/activity")
     app.register_blueprint(bpOnline, url_prefix="/online")
+    app.register_blueprint(bpOnsite, url_prefix="/onsite")
 
     _add_rules_help(app)
 
@@ -36,6 +39,8 @@ def create_app(config_name):
 
 
 def _add_rules_help(app):
+
+    from werkzeug.routing import RequestRedirect, MethodNotAllowed, NotFound, BuildError
 
     def _get_view_function(url, method='GET'):
         """Match a url and return the view and arguments
@@ -103,4 +108,3 @@ def _add_rules_help(app):
             else:
                 docs += doc
         return docs
-

@@ -3,7 +3,6 @@
 # filename: tests/test_root.py
 
 import unittest
-from flask import current_app
 from test_basic import TestCaseMixin
 
 

@@ -2,24 +2,23 @@
 # -*- coding: utf-8
 # filename: tests/test_user.py
 
-import time
 import unittest
-from flask import current_app
 from app.core.models import User
 from app.core.const import MAX_TIMESTAMP_DELAY
 from test_basic import TestCaseMixin
 
 
-openid = "wxid_kdjsalkfjalksjfadsfasfds"
+openid = "wxid_kdjsalkfjaladsjfajdslffds"
 
 
+@unittest.skip
 class UserTestCase(TestCaseMixin):
 
     def test_login(self):
-        r = self.client.post("/user/login", data={
+        r = self.client.post("/user/login", data=self._with_signature({
                 "openid": openid,
-                "timestamp": int(time.time() * 1000),
-            })
+                "timestamp": self._get_timestamp(),
+            }))
         self.check_status_code(r)
         self.check_errcode(r)
         respJson = r.get_json()
@@ -31,15 +30,15 @@ class UserTestCase(TestCaseMixin):
 
     @unittest.skip
     def test_login_no_openid(self):
-        r = self.client.post("/user/login", data={
-                "timestamp": int(time.time() * 1000),
-            })
+        r = self.client.post("/user/login", data=self._with_signature({
+                "timestamp": self._get_timestamp(),
+            }))
         print(r.get_json())
 
     @unittest.skip
     def test_login_no_timestamp(self):
-        r = self.client.post("/user/login", data={
+        r = self.client.post("/user/login", data=self._with_signature({
                 "openid": openid,
-                "timestamp": int(time.time() * 1000) - MAX_TIMESTAMP_DELAY,
-            })
+                "timestamp": self._get_timestamp() - MAX_TIMESTAMP_DELAY,
+            }))
         print(r.get_json())
