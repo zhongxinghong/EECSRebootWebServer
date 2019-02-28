@@ -15,7 +15,7 @@ openid = "wxid_kdjsalkfjaladsjfajdslffds"
 class UserTestCase(TestCaseMixin):
 
     def test_login(self):
-        r = self.client.post("/user/login", data=self._with_signature({
+        r = self.client.post("/user/login", data=self._with_sign({
                 "openid": openid,
                 "timestamp": self._get_timestamp(),
             }))
@@ -30,14 +30,14 @@ class UserTestCase(TestCaseMixin):
 
     @unittest.skip
     def test_login_no_openid(self):
-        r = self.client.post("/user/login", data=self._with_signature({
+        r = self.client.post("/user/login", data=self._with_sign({
                 "timestamp": self._get_timestamp(),
             }))
         print(r.get_json())
 
     @unittest.skip
     def test_login_no_timestamp(self):
-        r = self.client.post("/user/login", data=self._with_signature({
+        r = self.client.post("/user/login", data=self._with_sign({
                 "openid": openid,
                 "timestamp": self._get_timestamp() - MAX_TIMESTAMP_DELAY,
             }))

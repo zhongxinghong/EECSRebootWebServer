@@ -68,6 +68,9 @@ def _add_rules_help(app):
             # no view is associated with the endpoint
             return None
 
+    def _esc_doc(doc):
+        return doc.replace("\n", "<br>").replace(" ", "&nbsp;")
+
     def _get_doc(endpoint):
         url = url_for(endpoint)
         res =  _get_view_function(url) or _get_view_function(url, 'POST')
@@ -87,7 +90,7 @@ def _add_rules_help(app):
         else:
             doc += "null\n"
         doc += "\n\n\n"
-        return doc.replace("\n", "<br>").replace(" ", "&nbsp;")
+        return _esc_doc(doc)
 
     @app.route('/url_maps')
     def get_url_maps():
@@ -100,7 +103,53 @@ def _add_rules_help(app):
     @app.route('/docs')
     @app.route('/docs/')
     def get_docs():
-        docs = ""
+        docs = _esc_doc("""
+===================================
+EECS-Reboot Development Environment
+===================================
+
+通用错误：
+    - FormKeyMissingError
+    - FormValueTypeError
+    - FormValueOutOfRangeError
+    - FormValueFormatError
+    - InvalidTimestampError
+
+
+表单字段拼接：
+    表单字典按 key 的字典序排序（正常的升序），然后做成 urlencode 形式
+    但是不用 escape ，即: raw = "&k1=v1&k2=v2&k3=v3"
+    注：表单字段包含 timestamp
+
+
+鉴权字段构造：
+    authorization 字段用来代表某种权限，只有使用正确的 key 构造出的字段，才是有效的
+
+    构造方法：
+        首先将表单构造好，通过上述方式获得 raw
+        key = "xxxxxx"
+        type = "xxxxxx"
+        code = hmac(key.encode('utf-8')).md5.hexdigest(raw.encode('utf-8'))
+        authorization = "{type} {code}"   # 中间有一个空格
+
+    邀请码鉴权：
+        key = 邀请码（64 个字符）
+        type = "Invitation"
+
+    管理员鉴权：
+        key = 管理员密码（32 个字符）
+        type = "Administrator
+
+
+签名方法：
+    signature 字段，是对整个表单的签名，确保表单数据的真实性
+    需要在其他字段全部构造完毕的时候再构造这个签名
+
+    构造方法：
+        首先将整个表单构造好（包含鉴权字段！），并通过上述方式获得 raw
+        signature = md5.hexdigest(raw.encode('utf-8'))
+
+===================================\n\n\n""")
         for r in app.url_map.iter_rules():
             try:
                 doc = _get_doc(r.endpoint)

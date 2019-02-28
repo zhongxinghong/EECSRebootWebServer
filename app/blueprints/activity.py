@@ -56,15 +56,16 @@ def create_activity():
 
     :Method   POST
     :Form
-        - adminid     str       管理员id
-        - timestamp   int       毫秒时间戳
-        - signature   str       表单签名
-        - date        char[10]  活动时间，格式 yyyy-mm-dd ，确保长度为 10
-        - site        str       活动地点
-        - start       char[5]   活动开始时间，格式 HH:MM ，确保长度为 5
-        - end         char[5]   活动结束时间，格式 HH:MM ，确保长度为 5
+        - adminid         str       管理员id
+        - authorization   str       授权类型 + " " + 授权字段 (type: Administrator)
+        - timestamp       int       毫秒时间戳
+        - signature       str       表单签名
+        - date            char[10]  活动时间，格式 yyyy-mm-dd ，确保长度为 10
+        - site            str       活动地点
+        - start           char[5]   活动开始时间，格式 HH:MM ，确保长度为 5
+        - end             char[5]   活动结束时间，格式 HH:MM ，确保长度为 5
     :Return
-        - acitvityid   int   活动id
+        - acitvityid      int       活动id
     :Raise
         - RepeatedActivityError
     """

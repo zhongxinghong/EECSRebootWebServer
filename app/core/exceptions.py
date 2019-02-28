@@ -18,6 +18,8 @@ __all__ = [
         "InvalidTimestampError",
         "LoginStateError",
         "InvalidSignatureError",
+        "AuthorizationTypeError",
+        "InvalidAuthorizationCodeError",
 
         "RepeatedActivityError",
 
@@ -27,10 +29,15 @@ __all__ = [
         "NotWaitingStatusError",
         "HasOnsiteOrderError",
 
+        "AdminIDExistedError",
+        "AdminNotFoundError",
+        "AdminIDTooLongError",
+
     ]
 
 
 import time
+from .const import MAX_ADMIN_ID_LENGTH
 
 
 class EECSRebootException(Exception):
@@ -153,6 +160,27 @@ class InvalidSignatureError(ServerException):
         detail = {"invalid": signature}
         super().__init__(detail)
 
+class AuthorizationTypeError(ServerException):
+    """ 鉴权类型错误 """
+    code = 204
+    desc = "Incorrect type of authorization"
+
+    def __init__(self, type_):
+        detail = {"invalid": type_}
+        super().__init__(detail)
+
+class InvalidAuthorizationCodeError(ServerException):
+    """ 无效的 authorization code 字段 """
+    code = 205
+    desc = "Authorization code is invalid"
+
+    def __init__(self, type_, code):
+        detail = {
+            "type": type_,
+            "code": code,
+        }
+        super().__init__(detail)
+
 class RepeatedActivityError(ServerException):
     """ 活动重复创建 """
     code = 301
@@ -208,5 +236,35 @@ class HasOnsiteOrderError(ServerException):
         detail = {
             "onlineid": onlineid,
             "onsiteid": onsiteid,
+        }
+        super().__init__(detail)
+
+class AdminIDExistedError(ServerException):
+    """ 管理员账号已存在 """
+    code = 501
+    desc = "AdminID has already existed"
+
+    def __init__(self, adminid):
+        detail = {"adminid": adminid}
+        super().__init__(detail)
+
+class AdminNotFoundError(ServerException):
+    """ 管理员账号未找到 """
+    code = 502
+    desc = "AdminID was not found"
+
+    def __init__(self, adminid):
+        detail = {"adminid": adminid}
+        super().__init__(detail)
+
+class AdminIDTooLongError(ServerException):
+    """ 管理员账号id过长 """
+    code = 503
+    desc = "AdminID is too long"
+
+    def __init__(self, adminid):
+        detail = {
+            "adminid": adminid,
+            "limited": MAX_ADMIN_ID_LENGTH,
         }
         super().__init__(detail)

@@ -7,6 +7,8 @@ __all__ = [
     "db",
 
     "User",
+    "Admin",
+    "Activity",
     "OnlineOrder",
     "OnsiteOrder",
 
@@ -16,8 +18,8 @@ __all__ = [
 import time
 from flask_sqlalchemy import SQLAlchemy
 from .utils import regex_activity_date, regex_activity_time, regex_activity_period
-from .const import OnsiteOrderStatus, OnlineOrderStatus
-from .safety import xSHA1
+from .const import MAX_ADMIN_ID_LENGTH, OnsiteOrderStatus, OnlineOrderStatus
+from .safety import xSHA1, get_admin_password
 
 
 db = SQLAlchemy()
@@ -28,13 +30,31 @@ class User(db.Model):
     __tablename__ = "user"
 
     id     = db.Column(db.String(40), primary_key=True)
-    openid = db.Column(db.Text, nullable=True)
+    openid = db.Column(db.Text, nullable=False)
     online = db.relationship('OnlineOrder', backref='user', lazy='dynamic')
     onsite = db.relationship('OnsiteOrder', backref='user', lazy='dynamic')
 
-    def __init__(self, openid):
-        self.id = xSHA1(openid)
-        self.openid = openid
+    def __init__(self, openID):
+        self.id = xSHA1(openID)
+        self.openid = openID
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.id)
+
+
+class Admin(db.Model):
+
+    __tablename__ = "admin"
+
+    id       = db.Column(db.String(MAX_ADMIN_ID_LENGTH), primary_key=True)
+    password = db.Column(db.String(32), nullable=False)
+
+    def __init__(self, adminID):
+        assert len(adminID) <= MAX_ADMIN_ID_LENGTH
+        password = get_admin_password(adminID)
+        assert len(password) == 32
+        self.id = adminID
+        self.password = password
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.id)
@@ -87,6 +107,7 @@ class OnlineOrder(db.Model):
 
     def __init__(self, userID, activityID, period, model, type_, desc="", timestamp=None):
         assert regex_activity_period.match(period) is not None
+        assert len(userID) == 40
         self.status = OnlineOrderStatus.VALID
         self.user_id = userID
         self.activity_id = activityID
@@ -113,6 +134,7 @@ class OnsiteOrder(db.Model):
     timestamp   = db.Column(db.Integer, nullable=False) # 创建时间
 
     def __init__(self, userID, onlineID, activityID, timestamp=None):
+        assert len(userID) == 40
         self.user_id = userID
         self.online_id = onlineID
         self.activity_id = activityID

@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-from secret import MYSQL_USER, MYSQL_PASSWORD, SESSION_KEY
+from app.core.secret import MYSQL_USER, MYSQL_PASSWORD, SESSION_KEY
 
 
 def _get_mysql_uri(db):

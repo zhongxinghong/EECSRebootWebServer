@@ -7,7 +7,7 @@ from pprint import pprint
 import unittest
 from flask import current_app
 from app import create_app, db
-from app.core.safety import get_signature
+from app.core.safety import get_signature, get_admin_auth, get_invitation_auth
 from app.blueprints.activity import _get_latest_activity
 
 
@@ -49,7 +49,7 @@ class TestCaseMixin(unittest.TestCase):
     def _login(self, openid):
         if hasattr(self, "userid"):
             return
-        r = self.client.post("/user/login", data=self._with_signature({
+        r = self.client.post("/user/login", data=self._with_sign({
                 "openid": openid,
                 "timestamp": self._get_timestamp(),
             }))
@@ -62,10 +62,24 @@ class TestCaseMixin(unittest.TestCase):
             self.activity = activity
             self.periods = periods
 
-    def _with_signature(self, data):
+    def _with_sign(self, data):
         signature = get_signature(data)
         return dict(
                 signature = signature,
+                **data,
+            )
+
+    def _with_invitation_auth(self, data):
+        authorization = "Invitation %s" % get_invitation_auth(data)
+        return dict(
+                authorization = authorization,
+                **data,
+            )
+
+    def _with_admin_auth(self, data, password):
+        authorization = "Administrator %s" % get_admin_auth(data, password)
+        return dict(
+                authorization = authorization,
                 **data,
             )
 

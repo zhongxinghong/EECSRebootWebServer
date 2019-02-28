@@ -216,9 +216,10 @@ def get_all():
 
     :Method   POST
     :Form
-        - adminid     str   管理员id
-        - timestamp   int   毫秒时间戳
-        - signature   str   表单签名
+        - adminid         str   管理员id
+        - authorization   str   授权类型 + " " + 授权字段 (type: Administrator)
+        - timestamp       int   毫秒时间戳
+        - signature       str   表单签名
     :Return {
         'activity': {
             'date': '2018-10-22',
