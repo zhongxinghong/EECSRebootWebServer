@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: app/__init__.py
 
 __all__ = [
@@ -11,11 +11,11 @@ __all__ = [
     ]
 
 
-from flask import Flask, Blueprint, jsonify, url_for
+from flask import Flask, jsonify, url_for
 from config import CONFIGS_MAP
 from .core.globals import cache
 from .core.models import db
-from .blueprints import bpRoot, bpUser, bpActivity, bpOnline, bpOnsite
+from .blueprints import bpRoot, bpUser, bpActivity, bpOnline, bpOnsite, bpAdmin
 
 
 def create_app(config_name):
@@ -32,6 +32,7 @@ def create_app(config_name):
     app.register_blueprint(bpActivity, url_prefix="/activity")
     app.register_blueprint(bpOnline, url_prefix="/online")
     app.register_blueprint(bpOnsite, url_prefix="/onsite")
+    app.register_blueprint(bpAdmin, url_prefix="/admin")
 
     _add_rules_help(app)
 
@@ -43,12 +44,12 @@ def _add_rules_help(app):
     from werkzeug.routing import RequestRedirect, MethodNotAllowed, NotFound, BuildError
 
     def _get_view_function(url, method='GET'):
-        """Match a url and return the view and arguments
+        """
+        Match a url and return the view and arguments
         it will be called with, or None if there is no view.
 
         @see  https://stackoverflow.com/questions/38488134/get-the-flask-view-function-that-matches-a-url
         """
-
         adapter = app.url_map.bind('localhost')
 
         try:

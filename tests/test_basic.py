@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: tests/test_basic.py
 
 import time
+from pprint import pprint
 import unittest
 from flask import current_app
 from app import create_app, db
@@ -30,7 +31,7 @@ class TestCaseMixin(unittest.TestCase):
         try:
             self.assertTrue(status_code == code, status_code)
         except AssertionError as e:
-            print(respJson)
+            pprint(r.get_json())
             raise e
 
     def check_errcode(self, r):
@@ -39,7 +40,7 @@ class TestCaseMixin(unittest.TestCase):
         try:
             self.assertTrue(errcode == 0, errcode)
         except AssertionError as e:
-            print(respJson)
+            pprint(r.get_json())
             raise e
 
     def _get_timestamp(self):

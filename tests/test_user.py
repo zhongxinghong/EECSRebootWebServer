@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: tests/test_user.py
 
 import unittest

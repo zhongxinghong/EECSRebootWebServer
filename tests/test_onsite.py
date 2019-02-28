@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: tests/test_onsite.py
 
 from pprint import pprint
@@ -29,7 +29,7 @@ class OnsiteTestCase(TestCaseMixin):
         respJson = r.get_json()
         pprint(respJson)
 
-
+    @unittest.skip
     def test_current_position(self):
         self._login(openid)
         self._get_latest_activity()
@@ -47,6 +47,17 @@ class OnsiteTestCase(TestCaseMixin):
         r = self.client.post("/onsite/current_position", data=self._with_signature({
                 "userid": self.userid,
                 "onsiteid": onsiteid,
+                "timestamp": self._get_timestamp(),
+            }))
+        self.check_status_code(r)
+        self.check_errcode(r)
+        respJson = r.get_json()
+        pprint(respJson)
+
+
+    def test_get_queue(self):
+        r = self.client.post("/onsite/queue", data=self._with_signature({
+                "adminid": "adslkfjlksajflkjs",
                 "timestamp": self._get_timestamp(),
             }))
         self.check_status_code(r)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: exceptions.py
 
 __all__ = [
@@ -9,14 +9,18 @@ __all__ = [
     "ServerException",
         "OK",
         "UnknownException",
+
         "FormKeyMissingError",
         "FormValueTypeError",
         "FormValueOutOfRangeError",
         "FormValueFormatError",
+
         "InvalidTimestampError",
         "LoginStateError",
         "InvalidSignatureError",
+
         "RepeatedActivityError",
+
         "RepeatedOnlineOrderError",
         "OnlineOrderNotFoundError",
         "OnsiteOrderNotFoundError",
@@ -27,7 +31,6 @@ __all__ = [
 
 
 import time
-from flask import jsonify
 
 
 class EECSRebootException(Exception):

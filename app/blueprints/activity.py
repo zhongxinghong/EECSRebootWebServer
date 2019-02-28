@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: activity.py
 
 import datetime
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from ..core.models import db, Activity
-from ..core.parser import get_str_field
+from ..core.wrapper import api_view_wrapper
 from ..core.hooks import verify_timestamp, verify_signature, required_admin
+from ..core.parser import get_str_field
 from ..core.utils import regex_activity_date, regex_activity_time
 from ..core.const import ACTIVITY_PERIOD_SPAN
-from ..core.exceptions import OK, ServerException, UnknownException, RepeatedActivityError
+from ..core.exceptions import RepeatedActivityError
 
 
 bpActivity = Blueprint('activity', __name__)
@@ -35,6 +36,7 @@ def _get_periods(start, end, span):
 
     return periods
 
+
 def _get_latest_activity():
     """ 获得当前活动 """
     _latestDate = db.session.query(db.func.max(Activity.date)).scalar()
@@ -44,16 +46,17 @@ def _get_latest_activity():
 
 
 @bpActivity.route('/create', methods=['POST'])
-@verify_signature
-@required_admin
 @verify_timestamp
+@required_admin
+@verify_signature
+@api_view_wrapper
 def create_activity():
     """
     创建一个活动
 
     :Method   POST
     :Form
-        - adminid     str       adminid
+        - adminid     str       管理员id
         - timestamp   int       毫秒时间戳
         - signature   str       表单签名
         - date        char[10]  活动时间，格式 yyyy-mm-dd ，确保长度为 10
@@ -65,31 +68,28 @@ def create_activity():
     :Raise
         - RepeatedActivityError
     """
-    try:
-        data = request.form
-        timestamp = int(data['timestamp']) // 1000
-        date = get_str_field("date", data=data, regex=regex_activity_date)
-        site = get_str_field("site", data)
-        start = get_str_field("start", data=data, regex=regex_activity_time)
-        end = get_str_field("end", data=data, regex=regex_activity_time)
-        activity = Activity(date, site, start, end, timestamp)
-        a = Activity.query.filter(Activity.date == date).scalar()
-        if a is None:
-            db.session.add(activity)
-            db.session.commit()
-        else:
-            raise RepeatedActivityError(a)
-    except ServerException as e:
-        return jsonify(e.to_dict())
-    except Exception as e:
-        return jsonify(UnknownException(e).to_dict())
+    data = request.form
+    timestamp = int(data['timestamp']) // 1000
+    date = get_str_field("date", data=data, regex=regex_activity_date)
+    site = get_str_field("site", data)
+    start = get_str_field("start", data=data, regex=regex_activity_time)
+    end = get_str_field("end", data=data, regex=regex_activity_time)
+
+    activity = Activity(date, site, start, end, timestamp)
+    a = Activity.query.filter(Activity.date == date).scalar()
+    if a is None:
+        db.session.add(activity)
+        db.session.commit()
     else:
-        return jsonify(OK({
-                "activityid": activity.id,
-            }).to_dict())
+        raise RepeatedActivityError(a)
+
+    return {
+        "activityid": activity.id,
+    }
 
 
 @bpActivity.route('/get_latest')
+@api_view_wrapper
 def get_latest_activity():
     """
     获得最近的活动信息
@@ -110,18 +110,13 @@ def get_latest_activity():
         ]
     }
     """
-    try:
-        activity, periods = _get_latest_activity()
-    except ServerException as e:
-        return jsonify(e.to_dict())
-    except Exception as e:
-        return jsonify(UnknownException(e).to_dict())
-    else:
-        return jsonify(OK({
-            "date": activity.date,
-            "site": activity.site,
-            "start": activity.start,
-            "end": activity.end,
-            "periods": periods,
-        }).to_dict())
+    ACTIVITY, PERIODS = _get_latest_activity()
+
+    return {
+        "date": ACTIVITY.date,
+        "site": ACTIVITY.site,
+        "start": ACTIVITY.start,
+        "end": ACTIVITY.end,
+        "periods": PERIODS,
+    }
 

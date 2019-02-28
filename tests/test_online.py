@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 # filename: tests/test_online.py
 
 import random
@@ -75,6 +75,17 @@ class OnlineTestCase(TestCaseMixin):
         self._get_latest_activity()
         r = self.client.post("/test_signature", data=self._with_signature({
                 "userid": self.userid,
+                "timestamp": self._get_timestamp(),
+            }))
+        self.check_status_code(r)
+        self.check_errcode(r)
+        respJson = r.get_json()
+        pprint(respJson)
+
+
+    def test_get_all(self):
+        r = self.client.post("/online/all", data=self._with_signature({
+                "adminid": "dajflkajdslfjkdsaf",
                 "timestamp": self._get_timestamp(),
             }))
         self.check_status_code(r)
